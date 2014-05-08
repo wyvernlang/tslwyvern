@@ -9,21 +9,19 @@ package object ast {
     type T = String /* type names (T) */
     
     sealed case class Program(typeBindings : ListMap[T, TypeBinding], expr : EExp) /* programs (\rho) */
-    sealed case class TypeBinding(
+    case class TypeBinding(
         decl : TypeDecl,
         metadata : EExp
     )
     sealed abstract class TypeDecl
-    sealed case class ObjTypeDecl(
+    case class ObjTypeDecl(
         members : Map[L, MemberDecl]  /* \omega */) extends TypeDecl
     sealed abstract class MemberDecl(val t : Type)
-    sealed case class ValDecl(override val t : Type) extends MemberDecl(t)
-    sealed case class DefDecl(override val t : Arrow) extends MemberDecl(t)
-    sealed case class CaseTypeDecl(
+    case class ValDecl(override val t : Type) extends MemberDecl(t)
+    case class DefDecl(override val t : Arrow) extends MemberDecl(t)
+    case class CaseTypeDecl(
         cases : Map[C, CaseDecl] /* \chi */) extends TypeDecl
-    sealed case class CaseDecl(t : Type)
-    
-    sealed case class TIProgram(types : TContext, i : TIExp)
+    case class CaseDecl(t : Type)
     
   	sealed abstract class Type /* \tau */
 	sealed case class Named(name : T) extends Type
@@ -91,16 +89,17 @@ package object ast {
 	case class TIStr(s : String) extends TIExp(StringType())
     /* TODO: operations on these */
 		
-    type Context = Map[X, Type] /* \Gamma */
+    case class TIProgram(types : TContext, i : TIExp)
     type TContext = ListMap[T, TypeDesc] /* \Sigma */
 	sealed case class TypeDesc(
 	    decl : Option[TypeDecl], /* \delta */
 	    metadata : Option[TIExp] /* \mu */)
-
-	val empty_ctx : Context = Map()
 	val prelude : TContext = ListMap() /* \Sigma_0 */
 	
-	/* \vdash_\Sigma \rho \leadsto i */
+	type Context = Map[X, Type] /* \Gamma */
+    val empty_ctx : Context = Map()
+	
+    /* \vdash_\Sigma \rho \leadsto i */
     def check(p : Program) : TIProgram = {
       val types = p.typeBindings.foldLeft[TContext] (prelude) ({ 
         case (types, (name, TypeBinding(decl, metadata))) => {
