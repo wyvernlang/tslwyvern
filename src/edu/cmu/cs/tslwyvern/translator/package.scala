@@ -3,7 +3,7 @@ package edu.cmu.cs.tslwyvern
 import scala.collection.immutable.ListMap
 import edu.cmu.cs.tslwyvern.ast._
 
-package object translator { // To Scala source code
+package object translator { // To Scala source code  
 	def translate(types : TContext) : String = {
 	  val builder = new StringBuilder()
 	  for ((name, TypeDesc(Some(decl), Some(metadata))) <- types) {
@@ -88,7 +88,7 @@ package object translator { // To Scala source code
 	    }
 	    case TIParseStream(s) => s
 	    case TINum(n) => n.toString()
-	    case TIStr(s) => s
+	    case TIStr(str) => "\"" + str + "\""
 	  }
 	
 	def translate_members(im : ListMap[L, TIMemberDef]) : String = {

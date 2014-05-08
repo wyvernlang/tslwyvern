@@ -23,6 +23,8 @@ package object ast {
         cases : Map[C, CaseDecl] /* \chi */) extends TypeDecl
     sealed case class CaseDecl(t : Type)
     
+    sealed case class TIProgram(types : TContext, i : TIExp)
+    
   	sealed abstract class Type /* \tau */
 	sealed case class Named(name : T) extends Type
 	sealed case class Arrow(t1 : Type, t2 : Type) extends Type
@@ -99,7 +101,7 @@ package object ast {
 	val prelude : TContext = ListMap() /* \Sigma_0 */
 	
 	/* \vdash_\Sigma \rho \leadsto i */
-    def check(p : Program) : (TContext, TIExp) = {
+    def check(p : Program) : TIProgram = {
       val types = p.typeBindings.foldLeft[TContext] (prelude) ({ 
         case (types, (name, TypeBinding(decl, metadata))) => {
           if (types.isDefinedAt(name)) throw new TypeDeclError
@@ -113,7 +115,7 @@ package object ast {
           types + ((name, TypeDesc(Some(decl), Some(imetadata))))
         }
       })
-      (types, esyn(empty_ctx, types, p.expr))
+      TIProgram(types, esyn(empty_ctx, types, p.expr))
     }
     class StaticError extends Throwable /* base class for errors */
     class TypeDeclError extends StaticError

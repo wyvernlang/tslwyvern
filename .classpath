@@ -4,5 +4,16 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="/Users/cyrus/Downloads/scala-2.11.0/lib/scala-library.jar"/>
 	<classpathentry kind="lib" path="/Users/cyrus/Downloads/scala-2.11.0/lib/scala-compiler.jar"/>
+	<classpathentry kind="lib" path="/Users/cyrus/Downloads/scala-2.11.0/lib/scala-reflect.jar"/>
+	<classpathentry kind="lib" path="/Users/cyrus/Downloads/scala-2.11.0/lib/akka-actor_2.11-2.3.2.jar"/>
+	<classpathentry kind="lib" path="/Users/cyrus/Downloads/scala-2.11.0/lib/config-1.2.0.jar"/>
+	<classpathentry kind="lib" path="/Users/cyrus/Downloads/scala-2.11.0/lib/jline-2.11.jar"/>
+	<classpathentry kind="lib" path="/Users/cyrus/Downloads/scala-2.11.0/lib/scala-actors-2.11.0.jar"/>
+	<classpathentry kind="lib" path="/Users/cyrus/Downloads/scala-2.11.0/lib/scala-actors-migration_2.11-1.1.0.jar"/>
+	<classpathentry kind="lib" path="/Users/cyrus/Downloads/scala-2.11.0/lib/scala-continuations-library_2.11-1.0.1.jar"/>
+	<classpathentry kind="lib" path="/Users/cyrus/Downloads/scala-2.11.0/lib/scala-continuations-plugin_2.11.0-1.0.1.jar"/>
+	<classpathentry kind="lib" path="/Users/cyrus/Downloads/scala-2.11.0/lib/scala-parser-combinators_2.11-1.0.1.jar"/>
+	<classpathentry kind="lib" path="/Users/cyrus/Downloads/scala-2.11.0/lib/scala-swing_2.11-1.0.1.jar"/>
+	<classpathentry kind="lib" path="/Users/cyrus/Downloads/scala-2.11.0/lib/scala-xml_2.11-1.0.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
