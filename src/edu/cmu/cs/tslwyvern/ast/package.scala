@@ -13,7 +13,7 @@ package object ast {
 
   // Programs
   sealed case class Program(
-    typeBindings: List[TypeBinding] /* \theta */ ,
+    type_bindings: List[TypeBinding] /* \theta */ ,
     expr: EExp) /* \rho */
   case class TypeBinding(name: T, decl: TypeDecl, metadata: EExp)
   sealed abstract class TypeDecl

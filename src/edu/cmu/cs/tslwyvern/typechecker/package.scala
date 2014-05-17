@@ -12,13 +12,13 @@ package object typechecker {
 
   /* \vdash_\Theta \rho \sim \Theta \leadsto i : \tau */
   def check(p: Program): TIProgram = {
-    val types = check_typeBindings(p.typeBindings)
+    val types = check_type_bindings(p.type_bindings)
     TIProgram(types, syn(empty_ctx, types, p.expr))
   }
 
   /* \vdash_{\Theta_0} \theta \sim \Theta */
-  def check_typeBindings(typeBindings: List[TypeBinding]) = 
-    typeBindings.foldLeft[TContext](prelude.prelude_ctx)({
+  def check_type_bindings(types: List[TypeBinding]) = 
+    types.foldLeft[TContext](prelude.prelude_ctx)({
       case (types, TypeBinding(name, decl, metadata)) => {
         // TODO: recursive declarations
         if (types.isDefinedAt(name)) throw new TypeDeclError
