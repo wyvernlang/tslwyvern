@@ -4,11 +4,14 @@ import scala.collection.immutable.ListMap
 import scala.collection.immutable.Map
 
 package object ast {
+  // Identifiers
+  // NOTE: We do not check to see if these are valid (Scala) identifiers
   type X = String /* variables (x) */
   type L = String /* member labels (\ell) */
   type C = String /* case labels (C) */
   type T = String /* type names (T) */
 
+  // Programs
   sealed case class Program(
     typeBindings: List[TypeBinding] /* \theta */ ,
     expr: EExp) /* \rho */
@@ -26,15 +29,18 @@ package object ast {
     decl: Option[TypeDecl], /* \delta */
     metadata: Option[TIExp] /* \mu */ )
 
+  // Types
   sealed abstract class Type /* \tau */
   case class Named(name: T) extends Type
   case class Arrow(t1: Type, t2: Type) extends Type
+  /* For efficiency/simplicity, we build these in: */
   case class ParseStreamType() extends Type
   case class TupleType(t1: Type, t2: Type) extends Type
   case class UnitType() extends Type
   case class NumberType() extends Type
   case class StringType() extends Type
 
+  // Expressions
   sealed abstract class Exp /* expressions (e, \hat{e}) */
   sealed trait EExp extends Exp /* e */
   sealed trait HExp extends Exp /* \hat{e} */
@@ -78,8 +84,6 @@ package object ast {
 
   case class Spliced(e: EExp) extends HExp
 
-  /* For efficiency/simplicity, we build these in: */
-
   /* The intro form of parse streams is only in the internal language */
   case class TIParseStream(s: String) extends TIExp(ParseStreamType())
   case class PSToString[E <: Exp](e: E) extends EExp with HExp
@@ -99,6 +103,7 @@ package object ast {
 
   case class Num(n: Number) extends EExp with HExp
   case class TINum(n: Number) extends TIExp(NumberType())
+  // NOTE: We do not check if these are valid (Scala) binary numeric methods
   case class NumOp[E <: Exp](op: String, e1: E, e2: E) extends EExp with HExp
   case class TINumOp(op: String, i1: TIExp, i2: TIExp) extends TIExp(NumberType())
   case class NumIfEq[E <: Exp](e1: E, e2: E, e3: E, e4: E) extends EExp with HExp
@@ -109,6 +114,7 @@ package object ast {
 
   case class Str(s: String) extends EExp with HExp
   case class TIStr(s: String) extends TIExp(StringType())
+  // NOTE: We do not check if these are valid (Scala) binary string methods
   case class StrOp[E <: Exp](op: String, e1: E, e2: E) extends EExp with HExp
   case class TIStrOp(op: String, i1: TIExp, i2: TIExp) extends TIExp(StringType())
   case class StrIfEq[E <: Exp](e1: E, e2: E, e3: E, e4: E) extends EExp with HExp

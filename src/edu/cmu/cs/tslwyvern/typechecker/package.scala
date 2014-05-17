@@ -6,26 +6,19 @@ import scala.collection.mutable
 import ast._
 
 package object typechecker {
-  type Context = Map[X, (Type, X)] /* \Gamma */
-  val empty_ctx: Context = Map()
-  private val fresh_var_map: mutable.Map[X, Int] = mutable.Map()
-  private def fresh_var(x: X): X = {
-    val j = fresh_var_map.getOrElseUpdate(x, 0)
-    if (j == 0) {
-      return x
-    } else {
-      fresh_var_map.update(x, j + 1)
-      return s"$x$$$j"
-    }
-  }
-
   class StaticError extends Throwable /* base class for errors */
   class TypeDeclError extends StaticError
   class TypeError extends StaticError
 
-  /* \vdash_\Theta \rho \leadsto i */
+  /* \vdash_\Theta \rho \sim \Theta \leadsto i : \tau */
   def check(p: Program): TIProgram = {
-    val types = p.typeBindings.foldLeft[TContext](prelude.prelude_ctx)({
+    val types = check_typeBindings(p.typeBindings)
+    TIProgram(types, syn(empty_ctx, types, p.expr))
+  }
+
+  /* \vdash_{\Theta_0} \theta \sim \Theta */
+  def check_typeBindings(typeBindings: List[TypeBinding]) = 
+    typeBindings.foldLeft[TContext](prelude.prelude_ctx)({
       case (types, TypeBinding(name, decl, metadata)) => {
         // TODO: recursive declarations
         if (types.isDefinedAt(name)) throw new TypeDeclError
@@ -39,8 +32,6 @@ package object typechecker {
         types + ((name, TypeDesc(Some(decl), Some(imetadata))))
       }
     })
-    TIProgram(types, syn(empty_ctx, types, p.expr))
-  }
 
   /* \vdash_\Theta \omega 
    * \vdash_\Theta \chi
@@ -77,6 +68,33 @@ package object typechecker {
     case NumberType() => ()
     case StringType() => ()
   }
+
+  type Context = Map[X, (Type, X)] /* \Gamma */
+  val empty_ctx: Context = Map()
+  private val fresh_var_map: mutable.Map[X, Int] = mutable.Map()
+  private def fresh_var(x: X): X = {
+    // We create a fresh variable at each binder
+    // To ensure that rewriting of spliced[e] is capture-avoiding
+    val j = fresh_var_map.getOrElseUpdate(x, 0)
+    if (j == 0) {
+      return x
+    } else {
+      fresh_var_map.update(x, j + 1)
+      return s"$x$$$j"
+    }
+  }
+
+  /* convenience method for 
+   * Gamma \vdash_\Theta e \leadsto i \Leftarrow \tau
+   */
+  def ana(ctx: Context, types: TContext, e: EExp, t: Type): TIExp =
+    ana[EExp](null, ctx, types, e, t)
+
+  /* convenience method for 
+   * Gamma \vdash_\Theta e \leadsto i \Rightarrow \tau
+   */
+  def syn(ctx: Context, types: TContext, e: EExp): TIExp =
+    syn[EExp](null, ctx, types, e)
 
   /* \Gamma \vdash_\Theta e \leadsto i \Leftarrow \tau
    * \Gamma; \Gamma \vdash_\Theta \hat{e} \leadsto i \Leftarrow \tau
@@ -120,7 +138,7 @@ package object typechecker {
           val i_ap = TIAp(i_parse, i_ps, TupleType(Named("Exp"), ParseStreamType()))
           val p = TIProgram(types, i_ap)
           val (r_ast, _) = interpretter.eval(p)
-          val h_ast : HExp = throw new TypeError // TODO: dereification
+          val h_ast: HExp = throw new TypeError // TODO: dereification
           ana(ctx, empty_ctx, types, h_ast, t)
         }
         case _ => throw new TypeError
@@ -325,16 +343,4 @@ package object typechecker {
       case None => throw new TypeError
     }
   }
-
-  /* convenience method for 
-   * Gamma \vdash_\Theta e \leadsto i \Leftarrow \tau
-   */
-  def ana(ctx: Context, types: TContext, e: EExp, t: Type): TIExp =
-    ana[EExp](null, ctx, types, e, t)
-
-  /* convenience method for 
-   * Gamma \vdash_\Theta e \leadsto i \Rightarrow \tau
-   */
-  def syn(ctx: Context, types: TContext, e: EExp): TIExp =
-    syn[EExp](null, ctx, types, e)
 }
